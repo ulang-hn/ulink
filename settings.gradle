@@ -1,0 +1,3 @@
+rootProject.name = "ulink"
+include ':app'
+include ':libulink'
