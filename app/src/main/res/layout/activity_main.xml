@@ -1,18 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <TextView
+    <EditText
+        android:id="@+id/et_user"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:hint="登录账号"/>
+    <Button
+        android:id="@+id/btn_connect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:text="连接" />
+    <EditText
+        android:id="@+id/et_call"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:hint="呼叫账号"/>
+    <Button
+        android:id="@+id/btn_call"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="呼叫" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:id="@+id/ll_call_in"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+        <Button
+            android:id="@+id/btn_call_accept"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="接受" />
+        <Button
+            android:id="@+id/btn_call_refuse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="拒绝" />
+    </LinearLayout>
+
+</LinearLayout>

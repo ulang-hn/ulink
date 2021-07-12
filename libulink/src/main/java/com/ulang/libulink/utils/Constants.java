@@ -2,7 +2,8 @@ package com.ulang.libulink.utils;
 
 public class Constants {
     //P2P
-    public static final String P2P_BASE_URL = "http://192.168.0.11:8095";
+    //public static final String P2P_BASE_URL = "http://192.168.0.11:8095";
+    public static final String P2P_BASE_URL = "http://121.37.184.131:8095";
 
     /******************  p2p msg ***************************/
     public static final String P2P_MSG_CALL_IN = "p2p_msg_call_in";

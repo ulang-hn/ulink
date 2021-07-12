@@ -6,6 +6,8 @@ package owt.p2p;
 
 import android.util.Log;
 
+import com.ulang.libulink.utils.KLog;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,6 +44,7 @@ import static owt.base.Stream.StreamSourceInfo.VideoSourceInfo;
 import static owt.p2p.P2PClient.ServerConnectionStatus.CONNECTED;
 import static owt.p2p.P2PClient.ServerConnectionStatus.CONNECTING;
 import static owt.p2p.P2PClient.ServerConnectionStatus.DISCONNECTED;
+import static owt.p2p.P2PClient.SignalingMessageType.CHAT_CALL_MSG;
 import static owt.p2p.P2PClient.SignalingMessageType.CHAT_CLOSED;
 import static owt.p2p.P2PClient.SignalingMessageType.CHAT_DATA_ACK;
 import static owt.p2p.P2PClient.SignalingMessageType.CHAT_UA;
@@ -70,7 +73,7 @@ public final class P2PClient implements PeerConnectionChannel.PeerConnectionChan
          *
          * @param remoteStream RemoteStream added.
          */
-        void onStreamAdded(String peerId,RemoteStream remoteStream);
+        void onStreamAdded(String peerId, RemoteStream remoteStream);
 
         /**
          * Called upon receiving a message.
@@ -348,6 +351,31 @@ public final class P2PClient implements PeerConnectionChannel.PeerConnectionChan
         pcChannel.sendData(message, callback);
     }
 
+    public void sendCallMsg(String peerId, String message, ActionCallback<Void> callback) {
+        if (!checkConnectionStatus(CONNECTED)) {
+            triggerCallback(callback, new OwtError(OwtP2PError.P2P_CLIENT_INVALID_STATE.value,
+                    "Wrong server connection status."));
+            return;
+        }
+        if (!checkPermission(peerId, callback)) {
+            return;
+        }
+        RCHECK(message);
+        if (message.length() > 0xFFFF) {
+            triggerCallback(callback,
+                    new OwtError(OwtP2PError.P2P_CLIENT_ILLEGAL_ARGUMENT.value,
+                            "Message too long."));
+            return;
+        }
+        JSONObject callMsg = new JSONObject();
+        try {
+            callMsg.put("message", message);
+        } catch (JSONException e) {
+            DCHECK(e);
+        }
+        sendSignalingMessage(peerId, CHAT_CALL_MSG, callMsg, callback);
+    }
+
     private void permissionDenied(String peerId) {
         synchronized (pcChannelsLock) {
             if (pcChannels.containsKey(peerId)) {
@@ -428,11 +456,16 @@ public final class P2PClient implements PeerConnectionChannel.PeerConnectionChan
     }
 
     private <T> boolean checkPermission(String peerId, ActionCallback<T> callback) {
-        /*if (!allowedRemotePeers.contains(peerId) || peerId.equals(id)) {
+   /*     if (!allowedRemotePeers.contains(peerId) || peerId.equals(id)) {
             triggerCallback(callback,
                     new OwtError(OwtP2PError.P2P_CLIENT_NOT_ALLOWED.value, "Not allowed."));
             return false;
         }*/
+        if (peerId.equals(id)) {
+            triggerCallback(callback,
+                    new OwtError(OwtP2PError.P2P_CLIENT_NOT_ALLOWED.value, "Not allowed."));
+            return false;
+        }
         return true;
     }
 
@@ -574,6 +607,7 @@ public final class P2PClient implements PeerConnectionChannel.PeerConnectionChan
     @Override
     public void onIceCandidate(String peerId, IceCandidate candidate) {
         try {
+            KLog.e(candidate.toString());
             JSONObject candidateObject = new JSONObject();
             candidateObject.put("type", "candidates");
             candidateObject.put("candidate", candidate.sdp);
@@ -682,7 +716,7 @@ public final class P2PClient implements PeerConnectionChannel.PeerConnectionChan
                 }
                 synchronized (observers) {
                     for (P2PClientObserver observer : observers) {
-                        observer.onStreamAdded(peerId,(RemoteStream) remoteStream);
+                        observer.onStreamAdded(peerId, (RemoteStream) remoteStream);
                     }
                 }
             } catch (JSONException e) {
@@ -817,6 +851,14 @@ public final class P2PClient implements PeerConnectionChannel.PeerConnectionChan
                         }
                     }
                     break;
+                case CHAT_CALL_MSG:
+                    JSONObject callMsg = msgObj.getJSONObject("data");
+                    callbackExecutor.execute(() -> {
+                        for (P2PClientObserver observer : observers) {
+                            observer.onDataReceived(peerId, callMsg.optString("message"));
+                        }
+                    });
+                    break;
             }
 
         } catch (JSONException e) {
@@ -852,6 +894,8 @@ public final class P2PClient implements PeerConnectionChannel.PeerConnectionChan
         CHAT_UA("chat-ua"),
         CHAT_DATA_ACK("chat-data-received"),
         CHAT_CLOSED("chat-closed"),
+        //add by wlc
+        CHAT_CALL_MSG("chat-call-msg"),
         INVALID_TYPE("");
         String type;
 
@@ -877,6 +921,9 @@ public final class P2PClient implements PeerConnectionChannel.PeerConnectionChan
                     //TODO: remove 'chat-denied' on all platforms
                 case "chat-denied":
                     return CHAT_CLOSED;
+                //add by wlc
+                case "chat-call-msg":
+                    return CHAT_CALL_MSG;
                 default:
                     return INVALID_TYPE;
             }

@@ -34,7 +34,7 @@ import static owt.p2p.OwtP2PError.P2P_CONN_SERVER_UNKNOWN;
 /**
  * Socket.IO implementation of P2P signaling channel.
  */
-public class SocketSignalingChannel implements SignalingChannelInterface {
+class SocketSignalingChannel implements SignalingChannelInterface {
     private static final String TAG = "OWT-SocketClient";
     private final String CLIENT_CHAT_TYPE = "owt-message";
     private final String CLIENT_AUTHENTICATE_TYPE = "authentication";

@@ -111,7 +111,7 @@ public abstract class PeerConnectionChannel
             if (disposed()) {
                 return;
             }
-            Log.d(LOG_TAG, "create offer");
+            Log.e(LOG_TAG, "create offer");
             peerConnection.createOffer(PeerConnectionChannel.this, sdpConstraints);
         });
     }
@@ -122,7 +122,7 @@ public abstract class PeerConnectionChannel
             if (disposed()) {
                 return;
             }
-            Log.d(LOG_TAG, "creating answer");
+            Log.e(LOG_TAG, "creating answer");
             peerConnection.createAnswer(PeerConnectionChannel.this, sdpConstraints);
         });
     }

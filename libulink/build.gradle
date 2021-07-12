@@ -6,7 +6,7 @@ android {
     compileSdkVersion 30
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -48,5 +48,5 @@ dependencies {
         exclude group: 'org.json', module: 'json'
     }
 // https://mvnrepository.com/artifact/org.webrtc/google-webrtc
-    implementation group: 'org.webrtc', name: 'google-webrtc', version: '1.0.32006'
+     api group: 'org.webrtc', name: 'google-webrtc', version: '1.0.32006'
 }
