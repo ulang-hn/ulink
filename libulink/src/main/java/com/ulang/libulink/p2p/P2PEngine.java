@@ -90,14 +90,14 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
          *
          * @param error
          */
-        void onServerConnectFailed(OwtError error);
+        void onServerConnectFailed(String error);
 
         /**
          * 发布视频错误
          *
          * @param error
          */
-        void onPublishError(OwtError error);
+        void onPublishError(String error);
 
     }
 
@@ -284,7 +284,7 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
             public void onFailure(OwtError error) {
                 KLog.e(error.errorMessage);
                 if (p2PReceiver != null) {
-                    p2PReceiver.onServerConnectFailed(error);
+                    p2PReceiver.onServerConnectFailed(error.errorMessage);
                 }
             }
         });
@@ -355,7 +355,7 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
                     //this mean you have published, so change the button to unpublish
                 }
                 if (p2PReceiver != null) {
-                    p2PReceiver.onPublishError(error);
+                    p2PReceiver.onPublishError(error.errorMessage);
                 }
             }
         });
@@ -451,11 +451,19 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
     }
 
     /**
-     * 设置麦克风静音
+     * 设置音响静音
      * @param mute 静音
      */
     public void setSpeakerMute(boolean mute) {
         RCHECK(audioDeviceModule);
         audioDeviceModule.setSpeakerMute(mute);
+    }
+    /**
+     * 设置麦克风静音
+     * @param mute 静音
+     */
+    public void setMicrophoneMute(boolean mute) {
+        RCHECK(audioDeviceModule);
+        audioDeviceModule.setMicrophoneMute(mute);
     }
 }

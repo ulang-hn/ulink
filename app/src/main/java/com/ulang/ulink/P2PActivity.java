@@ -70,12 +70,12 @@ public class P2PActivity extends AppCompatActivity implements P2PEngine.P2PRecei
     }
 
     @Override
-    public void onServerConnectFailed(OwtError error) {
+    public void onServerConnectFailed(String error) {
 
     }
 
     @Override
-    public void onPublishError(OwtError error) {
+    public void onPublishError(String error) {
 
     }
 }

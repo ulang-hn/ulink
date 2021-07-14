@@ -135,12 +135,12 @@ public class MainActivity extends AppCompatActivity implements P2PEngine.P2PRece
     }
 
     @Override
-    public void onServerConnectFailed(OwtError error) {
+    public void onServerConnectFailed(String error) {
 
     }
 
     @Override
-    public void onPublishError(OwtError error) {
+    public void onPublishError(String error) {
 
     }
 }
