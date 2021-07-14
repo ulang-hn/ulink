@@ -7,14 +7,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
-import com.ulang.libulink.p2p.P2PClientModel;
+import com.ulang.libulink.p2p.P2PEngine;
 import com.ulang.libulink.utils.KLog;
 
 import owt.base.ActionCallback;
 import owt.base.OwtError;
 
 
-public class MainActivity extends AppCompatActivity implements P2PClientModel.P2PCallReceiver {
+public class MainActivity extends AppCompatActivity implements P2PEngine.P2PReceiver {
     private EditText etUser;
     private EditText etCall;
     private String callInPeerId;
@@ -28,13 +28,13 @@ public class MainActivity extends AppCompatActivity implements P2PClientModel.P2
         findViewById(R.id.btn_connect).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                P2PClientModel.getInstance().connect(etUser.getText().toString());
+                SApplication.getP2PEngine().connectServer(etUser.getText().toString());
             }
         });
         findViewById(R.id.btn_call).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                P2PClientModel.getInstance().call(etCall.getText().toString(), new ActionCallback(){
+                SApplication.getP2PEngine().call(etCall.getText().toString(), new ActionCallback(){
 
                     @Override
                     public void onSuccess(Object result) {
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements P2PClientModel.P2
         findViewById(R.id.btn_call_accept).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                P2PClientModel.getInstance().acceptCall(callInPeerId, new ActionCallback<Void>() {
+                SApplication.getP2PEngine().acceptCall(callInPeerId, new ActionCallback<Void>() {
                     @Override
                     public void onSuccess(Void result) {
                         Intent intent = new Intent();
@@ -70,10 +70,10 @@ public class MainActivity extends AppCompatActivity implements P2PClientModel.P2
         findViewById(R.id.btn_call_refuse).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                P2PClientModel.getInstance().refuseCall(callInPeerId,null);
+                SApplication.getP2PEngine().refuseCall(callInPeerId,null);
             }
         });
-        P2PClientModel.getInstance().registerCallReceiver(this);
+        SApplication.getP2PEngine().registerReceiver(this);
     }
 
     @Override
@@ -85,8 +85,8 @@ public class MainActivity extends AppCompatActivity implements P2PClientModel.P2
     @Override
     public void onDestroy() {
         super.onDestroy();
-        P2PClientModel.getInstance().unRegisterCallReceiver();
-        P2PClientModel.getInstance().disconnect();
+        SApplication.getP2PEngine().unRegisterReceiver();
+        SApplication.getP2PEngine().disconnectServer();
     }
 
     @Override
@@ -111,12 +111,36 @@ public class MainActivity extends AppCompatActivity implements P2PClientModel.P2
         Intent intent = new Intent();
         intent.setClass(MainActivity.this, P2PActivity.class);
         intent.putExtra("peerId", etCall.getText().toString());
-        intent.putExtra("isCaller", true);
         startActivity(intent);
     }
 
     @Override
     public void onCallRefuse(String peerId) {
+
+    }
+
+    @Override
+    public void onLeave(String peerId) {
+
+    }
+
+    @Override
+    public void onServerConnected() {
+
+    }
+
+    @Override
+    public void onServerDisconnected() {
+
+    }
+
+    @Override
+    public void onServerConnectFailed(OwtError error) {
+
+    }
+
+    @Override
+    public void onPublishError(OwtError error) {
 
     }
 }
