@@ -21,9 +21,9 @@ public abstract class MediaConstraints {
     }
 
     public final static class AudioTrackConstraints {
-        public boolean echoCancellation = false;
-        public boolean extendedFilterEchoCancellation = false;
-        public boolean delayAgnosticEchoCancellation = false;
+        public boolean echoCancellation = true;
+        public boolean extendedFilterEchoCancellation = true;
+        public boolean delayAgnosticEchoCancellation = true;
 
         org.webrtc.MediaConstraints convertToWebRTCConstraints() {
             org.webrtc.MediaConstraints result = new org.webrtc.MediaConstraints();
