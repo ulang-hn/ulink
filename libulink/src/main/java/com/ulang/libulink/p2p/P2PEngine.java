@@ -382,7 +382,7 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
         if (cameraCaptureConfiguration != null) {
             startCapture(cameraCaptureConfiguration.getWidth()
                     , cameraCaptureConfiguration.getHeight(), cameraCaptureConfiguration.getFps()
-                    , cameraCaptureConfiguration.getFps()
+                    , cameraCaptureConfiguration.getRotation()
                     , cameraCaptureConfiguration.isCameraFront());
         } else {
             startCapture(Constants.WIDTH_DEFAULT, Constants.HEIGHT_DEFAULT
