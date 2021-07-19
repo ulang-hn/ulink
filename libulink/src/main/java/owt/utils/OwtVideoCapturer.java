@@ -70,7 +70,15 @@ public final class OwtVideoCapturer extends Camera1Capturer implements VideoCapt
                 break;
             }
         }
+        if (enumerator.getDeviceNames().length > 1) {
 
-        return deviceName == null ? enumerator.getDeviceNames()[0] : deviceName;
+        }
+        return deviceName == null ? (isTwoCamera(enumerator, isCameraFront) ? enumerator.getDeviceNames()[1] : enumerator.getDeviceNames()[1])
+                : deviceName;
     }
+
+    private static boolean isTwoCamera(CameraEnumerator enumerator, boolean isCameraFront) {
+        return enumerator.getDeviceNames().length > 1 && !isCameraFront;
+    }
+
 }

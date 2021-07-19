@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.ulang.libulink.common.CameraCaptureConfiguration;
 import com.ulang.libulink.common.Constants;
+import com.ulang.libulink.common.ULinkVideoProcessor;
 import com.ulang.libulink.utils.KLog;
 
 import org.json.JSONException;
@@ -11,6 +12,9 @@ import org.json.JSONObject;
 import org.webrtc.EglBase;
 import org.webrtc.PeerConnection;
 import org.webrtc.SurfaceViewRenderer;
+import org.webrtc.VideoFrame;
+import org.webrtc.VideoProcessor;
+import org.webrtc.VideoSink;
 import org.webrtc.audio.AudioDeviceModule;
 import org.webrtc.audio.JavaAudioDeviceModule;
 
@@ -169,7 +173,7 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
         }
 
         public P2PEngine build() {
-            return new P2PEngine(serverUrl, cameraCaptureConfiguration, rootEglBase, audioDeviceModule,p2PReceiver);
+            return new P2PEngine(serverUrl, cameraCaptureConfiguration, rootEglBase, audioDeviceModule, p2PReceiver);
         }
     }
 
@@ -260,6 +264,7 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
 
     /**
      * 连接服务
+     *
      * @param uid 本地注册唯一uid
      */
     public void connectServer(String uid) {
@@ -363,11 +368,12 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
 
     /**
      * 开始视频通话
-     * @param peerId 对方的uid
-     * @param localRenderer 本地视频显示
+     *
+     * @param peerId         对方的uid
+     * @param localRenderer  本地视频显示
      * @param remoteRenderer 远程视频显示
      */
-    public void startTalk(String peerId, SurfaceViewRenderer localRenderer,SurfaceViewRenderer remoteRenderer) {
+    public void startTalk(String peerId, SurfaceViewRenderer localRenderer, SurfaceViewRenderer remoteRenderer) {
         this.peerId = peerId;
         RCHECK(localRenderer);
         initSurfaceViewRenderer(localRenderer);
@@ -376,10 +382,11 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
         if (cameraCaptureConfiguration != null) {
             startCapture(cameraCaptureConfiguration.getWidth()
                     , cameraCaptureConfiguration.getHeight(), cameraCaptureConfiguration.getFps()
+                    , cameraCaptureConfiguration.getFps()
                     , cameraCaptureConfiguration.isCameraFront());
         } else {
             startCapture(Constants.WIDTH_DEFAULT, Constants.HEIGHT_DEFAULT
-                    , Constants.FPS_DEFAULT, Constants.IS_CAMERA_FRONT_DEFAULT);
+                    , Constants.FPS_DEFAULT, -1, Constants.IS_CAMERA_FRONT_DEFAULT);
         }
     }
 
@@ -424,11 +431,12 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
      * @param framerate
      * @param isCameraFront
      */
-    private void startCapture(int width, int height, int framerate, boolean isCameraFront) {
+    private void startCapture(int width, int height, int framerate, int rotation, boolean isCameraFront) {
         owtVideoCapturer = OwtVideoCapturer.create(width, height, framerate, true,
                 isCameraFront);
         localStream = new LocalStream(owtVideoCapturer,
-                new MediaConstraints.AudioTrackConstraints());
+                new MediaConstraints.AudioTrackConstraints(),
+                rotation == -1 ? null : new ULinkVideoProcessor(rotation));
         //投影
         localStream.attach(localRenderer);
         //发布
@@ -452,14 +460,17 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
 
     /**
      * 设置音响静音
+     *
      * @param mute 静音
      */
     public void setSpeakerMute(boolean mute) {
         RCHECK(audioDeviceModule);
         audioDeviceModule.setSpeakerMute(mute);
     }
+
     /**
      * 设置麦克风静音
+     *
      * @param mute 静音
      */
     public void setMicrophoneMute(boolean mute) {

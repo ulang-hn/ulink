@@ -4,6 +4,7 @@ public final class CameraCaptureConfiguration {
     private int width;
     private int height;
     private int fps;
+    private int rotation = -1;
     private boolean isCameraFront;
 
     public CameraCaptureConfiguration(int width, int height, int fps, boolean isCameraFront) {
@@ -11,6 +12,22 @@ public final class CameraCaptureConfiguration {
         this.height = height;
         this.fps = fps;
         this.isCameraFront = isCameraFront;
+    }
+
+    public CameraCaptureConfiguration(int width, int height, int fps, int rotation, boolean isCameraFront) {
+        this.width = width;
+        this.height = height;
+        this.fps = fps;
+        this.rotation = rotation;
+        this.isCameraFront = isCameraFront;
+    }
+
+    public int getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(int rotation) {
+        this.rotation = rotation;
     }
 
     public int getWidth() {
