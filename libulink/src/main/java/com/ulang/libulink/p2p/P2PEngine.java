@@ -401,6 +401,7 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
 
     public void leave() {
         KLog.e("stop " + peerId);
+        hasRemoteAttached = false;
         p2PClient.stop(peerId);
         if (publication != null) {
             publication.stop();
@@ -417,9 +418,11 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
         }
         if (localRenderer != null) {
             localRenderer.release();
+            localRenderer = null;
         }
         if (remoteRenderer != null) {
             remoteRenderer.release();
+            remoteRenderer = null;
         }
     }
 
