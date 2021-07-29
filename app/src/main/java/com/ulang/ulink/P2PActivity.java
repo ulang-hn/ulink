@@ -5,10 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.ulang.libulink.p2p.P2PEngine;
-
-import org.webrtc.SurfaceEglRenderer;
 import org.webrtc.SurfaceViewRenderer;
-import owt.base.OwtError;
 
 
 public class P2PActivity extends AppCompatActivity implements P2PEngine.P2PReceiver {
@@ -25,7 +22,6 @@ public class P2PActivity extends AppCompatActivity implements P2PEngine.P2PRecei
         sv2 = findViewById(R.id.sv_2);
         SApplication.getP2PEngine().registerReceiver(this);
         SApplication.getP2PEngine().startTalk(peerId,sv1,sv2);
-
     }
 
     @Override

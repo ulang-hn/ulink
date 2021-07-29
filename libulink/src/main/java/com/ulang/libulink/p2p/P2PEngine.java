@@ -374,19 +374,25 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
      * @param remoteRenderer 远程视频显示
      */
     public void startTalk(String peerId, SurfaceViewRenderer localRenderer, SurfaceViewRenderer remoteRenderer) {
+        release();
         this.peerId = peerId;
-        RCHECK(localRenderer);
-        initSurfaceViewRenderer(localRenderer);
-        this.localRenderer = localRenderer;
-        setRemoteRenderer(remoteRenderer);
-        if (cameraCaptureConfiguration != null) {
-            startCapture(cameraCaptureConfiguration.getWidth()
-                    , cameraCaptureConfiguration.getHeight(), cameraCaptureConfiguration.getFps()
-                    , cameraCaptureConfiguration.getRotation()
-                    , cameraCaptureConfiguration.isCameraFront());
+        if (localRenderer != null) {
+            initSurfaceViewRenderer(localRenderer);
+            this.localRenderer = localRenderer;
+            if (cameraCaptureConfiguration != null) {
+                startCapture(cameraCaptureConfiguration.getWidth()
+                        , cameraCaptureConfiguration.getHeight(), cameraCaptureConfiguration.getFps()
+                        , cameraCaptureConfiguration.getRotation()
+                        , cameraCaptureConfiguration.isCameraFront());
+            } else {
+                startCapture(Constants.WIDTH_DEFAULT, Constants.HEIGHT_DEFAULT
+                        , Constants.FPS_DEFAULT, -1, Constants.IS_CAMERA_FRONT_DEFAULT);
+            }
         } else {
-            startCapture(Constants.WIDTH_DEFAULT, Constants.HEIGHT_DEFAULT
-                    , Constants.FPS_DEFAULT, -1, Constants.IS_CAMERA_FRONT_DEFAULT);
+            startRecord();
+        }
+        if (remoteRenderer != null) {
+            setRemoteRenderer(remoteRenderer);
         }
     }
 
@@ -399,10 +405,9 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
         }
     }
 
-    public void leave() {
-        KLog.e("stop " + peerId);
+    private void release(){
+        peerId = null;
         hasRemoteAttached = false;
-        p2PClient.stop(peerId);
         if (publication != null) {
             publication.stop();
             publication = null;
@@ -429,6 +434,15 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
         }
     }
 
+    public void leave() {
+        KLog.e("leave");
+        if(peerId != null) {
+            KLog.e("stop " + peerId);
+            p2PClient.stop(peerId);
+        }
+        release();
+    }
+
     /**
      * 打开摄像头
      *
@@ -449,8 +463,19 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
         publish(peerId);
     }
 
+    /**
+     * 只录音
+     */
+    private void startRecord() {
+        localStream = new LocalStream(new MediaConstraints.AudioTrackConstraints());
+        //发布
+        publish(peerId);
+    }
+
     public void switchCamera() {
-        owtVideoCapturer.switchCamera();
+        if (owtVideoCapturer != null) {
+            owtVideoCapturer.switchCamera();
+        }
     }
 
     /**
