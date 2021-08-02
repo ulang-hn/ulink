@@ -225,7 +225,8 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
     @Override
     public void onStreamAdded(String peerId, RemoteStream remoteStream) {
         KLog.e();
-        remoteStream.addObserver(new owt.base.RemoteStream.StreamObserver() {
+        this.remoteStream = remoteStream;
+        this.remoteStream.addObserver(new owt.base.RemoteStream.StreamObserver() {
             @Override
             public void onEnded() {
                 if (p2PReceiver != null) {
@@ -238,11 +239,10 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
 
             }
         });
-        if (remoteRenderer != null) {
-            remoteStream.attach(remoteRenderer);
+        if (remoteRenderer != null && !hasRemoteAttached) {
+            this.remoteStream.attach(remoteRenderer);
             hasRemoteAttached = true;
         }
-        this.remoteStream = remoteStream;
     }
 
     @Override
@@ -401,11 +401,12 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
         initSurfaceViewRenderer(remoteRenderer);
         this.remoteRenderer = remoteRenderer;
         if (remoteStream != null && !hasRemoteAttached) {
-            remoteStream.attach(remoteRenderer);
+            remoteStream.attach(this.remoteRenderer);
+            hasRemoteAttached = true;
         }
     }
 
-    private void release(){
+    private void release() {
         peerId = null;
         hasRemoteAttached = false;
         if (publication != null) {
@@ -436,7 +437,7 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
 
     public void leave() {
         KLog.e("leave");
-        if(peerId != null) {
+        if (peerId != null) {
             KLog.e("stop " + peerId);
             p2PClient.stop(peerId);
         }
