@@ -374,7 +374,6 @@ public class P2PEngine implements P2PClient.P2PClientObserver {
      * @param remoteRenderer 远程视频显示
      */
     public void startTalk(String peerId, SurfaceViewRenderer localRenderer, SurfaceViewRenderer remoteRenderer) {
-        release();
         this.peerId = peerId;
         if (localRenderer != null) {
             initSurfaceViewRenderer(localRenderer);
